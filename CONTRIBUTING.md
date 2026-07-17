@@ -44,12 +44,14 @@ When changing:
 - `.github/workflows/promote.yml`
 - `deploy/deploy-sim.ps1`
 - `deploy/health-check.ps1`
+- workflow permissions or environment usage
 
 also verify that:
 - self-hosted runner labels are still correct
 - GitHub Environment usage is still correct
 - checksum validation behavior remains consistent
 - log output is still usable for operators
+- the workflow token permissions are still minimal for the task
 
 ## Code review
 

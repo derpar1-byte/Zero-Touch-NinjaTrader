@@ -41,3 +41,16 @@ Recommended baseline practices:
 - validate checksum files before moving deployment artifacts
 - keep .NET and PowerShell updated on the runner machine
 - avoid storing secrets directly in repository files
+- prefer environment variables/secrets over hardcoded machine-specific values
+- give workflows the minimum required token permissions
+- review any change to `.github/workflows/` and `deploy/` as security-sensitive
+
+## Workflow dispatch and permissions guidance
+
+Recommended GitHub Actions posture for this repository:
+- keep build/test workflows broadly runnable for normal collaboration
+- restrict manual deploy and promote workflow dispatch to trusted operators
+- use GitHub Environments to gate higher-risk workflows
+- grant `contents: write` only to release workflows that need to publish releases
+- avoid broad secret exposure to pull request workflows
+- prefer environment-level scoping for deploy-related variables and secrets

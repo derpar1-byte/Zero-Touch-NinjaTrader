@@ -189,6 +189,29 @@ tests/Common.Tests/    unit tests
 - Contribution expectations are documented in `CONTRIBUTING.md`.
 - Security reporting and hardening guidance are documented in `SECURITY.md`.
 
+## Branch protection and repository settings checklist
+
+Recommended settings for `main`:
+- set `main` as the default branch
+- require pull requests before merging
+- require at least 1 approval
+- require status checks before merging
+- require conversation resolution before merging
+- require review from code owners
+- block direct pushes after bootstrap
+
+Recommended GitHub Actions settings:
+- allow GitHub Actions to read repository contents by default
+- grant `contents: write` only to workflows that create releases
+- restrict who can manually run deployment and promotion workflows
+- prefer environment-scoped secrets/variables for deploy targets
+
+Recommended environment settings:
+- create `sim` for deployment testing if you want environment-level controls there
+- create `validated` for promotion approvals
+- require reviewers on `validated`
+- optionally add a wait timer on `validated`
+
 ## Repo-level .NET settings
 
 This repository includes:

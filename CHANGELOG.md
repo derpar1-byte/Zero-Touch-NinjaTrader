@@ -17,6 +17,8 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - Basic config validation library, CLI, and unit tests.
 - PR template, issue templates, and `CODEOWNERS` governance scaffolding.
 - `CONTRIBUTING.md` and `SECURITY.md` repository policy scaffolding.
+- GitHub Release workflow for `v*` tags.
+- Branch protection, workflow permission, and hardening guidance in project documentation.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

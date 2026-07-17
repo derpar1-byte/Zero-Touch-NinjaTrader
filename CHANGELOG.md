@@ -52,6 +52,9 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - FAQ documentation.
 - Workflow permissions matrix.
 - End-to-end first release walkthrough for `v1.0.0`.
+- `SUPPORT.md` support path documentation.
+- Glossary documentation.
+- Release artifact naming reference page.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

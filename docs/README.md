@@ -8,6 +8,7 @@ This directory contains the operational and release-management documentation for
 - [hotfix-process.md](hotfix-process.md) - expedited patch-release process for urgent fixes.
 - [promotion-model.md](promotion-model.md) - current sim-to-validated model and future validated-to-production evolution.
 - [release-notes-v1.0.0-example.md](release-notes-v1.0.0-example.md) - sample GitHub Release notes for the first tagged release.
+- [release-artifact-naming-reference.md](release-artifact-naming-reference.md) - package and checksum naming conventions.
 
 ## Deployment and rollback
 - [rollback.md](rollback.md) - rollback principles, artifact selection, and rollback workflow usage.
@@ -22,6 +23,7 @@ This directory contains the operational and release-management documentation for
 - [runner-ops.md](runner-ops.md) - Windows self-hosted runner maintenance and troubleshooting.
 - [operator-checklist.md](operator-checklist.md) - release/deploy day operator checklist.
 - [faq.md](faq.md) - quick answers for common operator and maintainer questions.
+- [glossary.md](glossary.md) - shared terminology for workflows, artifacts, environments, and rollback.
 
 ## Suggested reading order
 

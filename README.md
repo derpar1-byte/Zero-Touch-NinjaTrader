@@ -121,9 +121,14 @@ Start here based on task:
 - Incident handling for failed promotions/rollbacks: `docs/promotion-rollback-incident-runbook.md`
 - Workflow failure troubleshooting: `docs/workflow-troubleshooting-matrix.md`
 - Workflow permission model: `docs/workflow-permissions-matrix.md`
+- Artifact naming reference: `docs/release-artifact-naming-reference.md`
 - Runner maintenance: `docs/runner-ops.md`
 - Production environment setup: `docs/production-environment-checklist.md`
 - Release notes example: `docs/release-notes-v1.0.0-example.md`
+- Artifact naming reference: `docs/release-artifact-naming-reference.md`
+- Support and contact paths: `SUPPORT.md`
+- Shared terminology: `docs/glossary.md`
+- Support and help path: `SUPPORT.md`
 
 ## Release process
 

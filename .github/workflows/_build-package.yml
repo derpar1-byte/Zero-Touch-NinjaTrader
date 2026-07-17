@@ -59,8 +59,12 @@ jobs:
         shell: pwsh
         run: |
           $config = Get-Content 'src/Common/appsettings.json' | ConvertFrom-Json
+          $packageVersion = '${{ inputs.package_version }}'
+          if ($packageVersion.StartsWith('v')) {
+            $packageVersion = $packageVersion.Substring(1)
+          }
           "package_name=$($config.name)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-          "package_version=${{ inputs.package_version }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "package_version=$packageVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
           "strategy_name=$($config.strategyName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Restore

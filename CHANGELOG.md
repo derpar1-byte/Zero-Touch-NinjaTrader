@@ -23,6 +23,8 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - CodeQL workflow for scheduled and PR/push static analysis.
 - Reusable build/package workflow to reduce duplication across CI and release automation.
 - MIT license file.
+- Reusable deploy/promote workflow to reduce duplication across self-hosted deployment jobs.
+- README status badges for CI, release, and CodeQL workflows.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

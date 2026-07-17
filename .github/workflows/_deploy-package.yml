@@ -1,0 +1,83 @@
+name: _deploy-package
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        required: false
+        type: string
+        default: zerotouch-package
+      package_file:
+        required: false
+        type: string
+        default: ''
+      drop_folder:
+        required: true
+        type: string
+      log_folder:
+        required: true
+        type: string
+      require_checksum:
+        required: false
+        type: boolean
+        default: false
+    outputs:
+      package:
+        description: Resolved package path
+        value: ${{ jobs.deploy.outputs.package }}
+      checksum:
+        description: Resolved checksum path
+        value: ${{ jobs.deploy.outputs.checksum }}
+    secrets: {}
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, windows, nt8]
+    outputs:
+      package: ${{ steps.resolve.outputs.package }}
+      checksum: ${{ steps.resolve.outputs.checksum }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: artifacts
+
+      - name: Resolve package
+        id: resolve
+        shell: pwsh
+        run: |
+          if ("${{ inputs.package_file }}") {
+            $package = Join-Path (Resolve-Path 'artifacts') "${{ inputs.package_file }}"
+          } else {
+            $package = (Get-ChildItem artifacts -Recurse -Filter *-latest.zip | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+            if (-not $package) {
+              $package = (Get-ChildItem artifacts -Recurse -Filter *.zip | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
+            }
+          }
+
+          if (-not $package -or -not (Test-Path $package)) {
+            throw 'No deployment package found.'
+          }
+
+          $checksum = "${package}.sha256"
+          if (-not (Test-Path $checksum)) {
+            $checksum = ''
+          }
+
+          "package=$package" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "checksum=$checksum" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Deploy package
+        shell: pwsh
+        run: |
+          ./deploy/deploy-sim.ps1 -ArtifactPath "${{ steps.resolve.outputs.package }}" -DropFolder "${{ inputs.drop_folder }}" -LogFolder "${{ inputs.log_folder }}" -ChecksumPath "${{ steps.resolve.outputs.checksum }}"
+
+      - name: Health check
+        shell: pwsh
+        run: |
+          ./deploy/health-check.ps1 -DropFolder "${{ inputs.drop_folder }}" -LogFolder "${{ inputs.log_folder }}" -RequireChecksum:${{ inputs.require_checksum }}

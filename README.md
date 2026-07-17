@@ -1,4 +1,12 @@
+[![CI](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/ci.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/ci.yml)
+[![Release](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/release.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/release.yml)
+[![CodeQL](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml)
+
 # Zero-Touch-NinjaTrader
+
+[![CI](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/ci.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/ci.yml)
+[![Release](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/release.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/release.yml)
+[![CodeQL](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml)
 
 GitHub Actions automation scaffold for a NinjaTrader 8 strategy delivery pipeline with build validation, packaging, simulated deployment, and supervised promotion gates.
 
@@ -115,6 +123,15 @@ Artifact outputs include:
 - `artifacts/exports/<package>-<strategy>-<version>-<timestamp>.zip.sha256`
 - `artifacts/packages/<package>-<strategy>-latest.zip`
 
+### `_deploy-package.yml`
+
+Reusable workflow used by manual deployment and promotion:
+- downloads the selected artifact bundle
+- resolves the requested package file or newest `*-latest.zip`
+- resolves and verifies the matching checksum file when present
+- copies package/checksum to the target Windows drop folder
+- runs post-deploy health checks with optional checksum enforcement
+
 ### `deploy-sim.yml`
 
 Runs manually:
@@ -155,7 +172,8 @@ Reusable workflow used by CI and release automation:
 
 Runs on version tags:
 - restores, builds, and tests the solution
-- packages release artifacts using the tag version
+- normalizes tag versions like `v1.0.0` to package version `1.0.0`
+- packages release artifacts using the normalized semantic version
 - generates checksum files
 - publishes a GitHub Release with attached artifacts
 

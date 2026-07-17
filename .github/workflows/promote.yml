@@ -14,50 +14,11 @@ on:
 
 jobs:
   promote:
-    runs-on: [self-hosted, windows, nt8]
     environment: validated
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ inputs.artifact_name }}
-          path: artifacts
-
-      - name: Resolve package
-        id: resolve
-        shell: pwsh
-        run: |
-          if ("${{ inputs.package_file }}") {
-            $package = Join-Path (Resolve-Path 'artifacts') "${{ inputs.package_file }}"
-          } else {
-            $package = (Get-ChildItem artifacts -Recurse -Filter *-latest.zip | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
-            if (-not $package) {
-              $package = (Get-ChildItem artifacts -Recurse -Filter *.zip | Sort-Object LastWriteTime -Descending | Select-Object -First 1).FullName
-            }
-          }
-
-          if (-not $package -or -not (Test-Path $package)) {
-            throw 'No package file found for promotion.'
-          }
-
-          $checksum = "${package}.sha256"
-          if (-not (Test-Path $checksum)) {
-            $checksum = ''
-          }
-
-          "package=$package" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-          "checksum=$checksum" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
-
-      - name: Promote package
-        shell: pwsh
-        run: |
-          ./deploy/deploy-sim.ps1 -ArtifactPath "${{ steps.resolve.outputs.package }}" -DropFolder "${{ vars.NT8_VALIDATED_DROP_FOLDER }}" -LogFolder "${{ vars.NT8_LOG_FOLDER }}" -ChecksumPath "${{ steps.resolve.outputs.checksum }}"
-
-      - name: Post-promotion health check
-        shell: pwsh
-        run: |
-          ./deploy/health-check.ps1 -DropFolder "${{ vars.NT8_VALIDATED_DROP_FOLDER }}" -LogFolder "${{ vars.NT8_LOG_FOLDER }}" -RequireChecksum:([bool]::Parse('${{ steps.resolve.outputs.checksum != '' }}'))
+    uses: ./.github/workflows/_deploy-package.yml
+    with:
+      artifact_name: ${{ inputs.artifact_name }}
+      package_file: ${{ inputs.package_file }}
+      drop_folder: ${{ vars.NT8_VALIDATED_DROP_FOLDER }}
+      log_folder: ${{ vars.NT8_LOG_FOLDER }}
+      require_checksum: false

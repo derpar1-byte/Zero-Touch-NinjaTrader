@@ -143,6 +143,21 @@ Runs manually:
 - copies and validates the checksum when present
 - runs post-promotion health validation that revalidates the checksum when used
 
+### `release.yml`
+
+Runs on version tags:
+- restores, builds, and tests the solution
+- packages release artifacts using the tag version
+- generates checksum files
+- publishes a GitHub Release with attached artifacts
+
+### `codeql.yml`
+
+Runs on pushes, pull requests, and a weekly schedule:
+- initializes CodeQL for C#
+- builds the solution
+- publishes static analysis results to GitHub Security
+
 ## PowerShell packaging convention
 
 `deploy/package-nt8.ps1` creates a NinjaTrader-style zip package for supervised import workflows.
@@ -205,6 +220,8 @@ Recommended GitHub Actions settings:
 - grant `contents: write` only to workflows that create releases
 - restrict who can manually run deployment and promotion workflows
 - prefer environment-scoped secrets/variables for deploy targets
+- enable Dependabot for GitHub Actions version updates
+- enable CodeQL analysis for ongoing static security scanning
 
 Recommended environment settings:
 - create `sim` for deployment testing if you want environment-level controls there

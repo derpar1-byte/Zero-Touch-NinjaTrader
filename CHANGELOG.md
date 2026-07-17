@@ -19,6 +19,8 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - `CONTRIBUTING.md` and `SECURITY.md` repository policy scaffolding.
 - GitHub Release workflow for `v*` tags.
 - Branch protection, workflow permission, and hardening guidance in project documentation.
+- Dependabot configuration for GitHub Actions updates.
+- CodeQL workflow for scheduled and PR/push static analysis.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

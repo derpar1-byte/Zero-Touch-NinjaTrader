@@ -54,3 +54,5 @@ Recommended GitHub Actions posture for this repository:
 - grant `contents: write` only to release workflows that need to publish releases
 - avoid broad secret exposure to pull request workflows
 - prefer environment-level scoping for deploy-related variables and secrets
+- keep GitHub Actions dependencies current with Dependabot
+- enable CodeQL or equivalent static analysis for scheduled security scanning

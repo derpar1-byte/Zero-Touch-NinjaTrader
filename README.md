@@ -1,12 +1,10 @@
 [![CI](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/ci.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/ci.yml)
 [![Release](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/release.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/release.yml)
+[![Deploy Sim](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/deploy-sim.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/deploy-sim.yml)
+[![Promote](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/promote.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/promote.yml)
 [![CodeQL](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml)
 
 # Zero-Touch-NinjaTrader
-
-[![CI](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/ci.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/ci.yml)
-[![Release](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/release.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/release.yml)
-[![CodeQL](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml)
 
 GitHub Actions automation scaffold for a NinjaTrader 8 strategy delivery pipeline with build validation, packaging, simulated deployment, and supervised promotion gates.
 
@@ -105,6 +103,10 @@ Edit `src/Common/appsettings.json`:
 }
 ```
 
+## Release process
+
+Release tagging and packaging conventions are documented in `docs/release-process.md`.
+
 ## Workflow overview
 
 ### `ci.yml`
@@ -129,7 +131,8 @@ Reusable workflow used by manual deployment and promotion:
 - downloads the selected artifact bundle
 - resolves the requested package file or newest `*-latest.zip`
 - resolves and verifies the matching checksum file when present
-- copies package/checksum to the target Windows drop folder
+- supports `dry_run` mode for first-time runner validation without copying files
+- copies package/checksum to the target Windows drop folder when not in dry run
 - runs post-deploy health checks with optional checksum enforcement
 
 ### `deploy-sim.yml`

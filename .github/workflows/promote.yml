@@ -11,6 +11,11 @@ on:
         description: Specific package file name inside the artifact directory
         required: false
         default: ''
+      dry_run:
+        description: Resolve package/checksum without copying files
+        required: false
+        default: false
+        type: boolean
 
 jobs:
   promote:
@@ -22,3 +27,4 @@ jobs:
       drop_folder: ${{ vars.NT8_VALIDATED_DROP_FOLDER }}
       log_folder: ${{ vars.NT8_LOG_FOLDER }}
       require_checksum: false
+      dry_run: ${{ inputs.dry_run }}

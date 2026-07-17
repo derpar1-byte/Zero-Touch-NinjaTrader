@@ -21,6 +21,10 @@ on:
         required: false
         type: boolean
         default: false
+      dry_run:
+        required: false
+        type: boolean
+        default: false
     outputs:
       package:
         description: Resolved package path
@@ -73,11 +77,27 @@ jobs:
           "checksum=$checksum" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
 
       - name: Deploy package
+        if: ${{ !inputs.dry_run }}
         shell: pwsh
         run: |
           ./deploy/deploy-sim.ps1 -ArtifactPath "${{ steps.resolve.outputs.package }}" -DropFolder "${{ inputs.drop_folder }}" -LogFolder "${{ inputs.log_folder }}" -ChecksumPath "${{ steps.resolve.outputs.checksum }}"
 
+      - name: Dry run summary
+        if: ${{ inputs.dry_run }}
+        shell: pwsh
+        run: |
+          Write-Host "Dry run enabled. No files will be copied."
+          Write-Host "Resolved package: ${{ steps.resolve.outputs.package }}"
+          if ("${{ steps.resolve.outputs.checksum }}") {
+            Write-Host "Resolved checksum: ${{ steps.resolve.outputs.checksum }}"
+          } else {
+            Write-Host "No checksum file resolved."
+          }
+          Write-Host "Target drop folder: ${{ inputs.drop_folder }}"
+          Write-Host "Target log folder: ${{ inputs.log_folder }}"
+
       - name: Health check
+        if: ${{ !inputs.dry_run }}
         shell: pwsh
         run: |
           ./deploy/health-check.ps1 -DropFolder "${{ inputs.drop_folder }}" -LogFolder "${{ inputs.log_folder }}" -RequireChecksum:${{ inputs.require_checksum }}

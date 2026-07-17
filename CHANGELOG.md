@@ -25,6 +25,9 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - MIT license file.
 - Reusable deploy/promote workflow to reduce duplication across self-hosted deployment jobs.
 - README status badges for CI, release, and CodeQL workflows.
+- Semantic release process documentation with tag examples.
+- Visible README status badges for deploy and promote workflows.
+- Dry-run mode for reusable deployment workflow validation.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

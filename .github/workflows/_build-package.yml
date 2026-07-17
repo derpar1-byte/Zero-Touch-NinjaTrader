@@ -1,0 +1,110 @@
+name: _build-package
+
+on:
+  workflow_call:
+    inputs:
+      package_version:
+        required: true
+        type: string
+      upload_artifact:
+        required: false
+        type: boolean
+        default: true
+      artifact_name:
+        required: false
+        type: string
+        default: zerotouch-package
+    outputs:
+      artifact_name:
+        description: Uploaded artifact name
+        value: ${{ jobs.build-package.outputs.artifact_name }}
+      package_name:
+        description: Package name from config
+        value: ${{ jobs.build-package.outputs.package_name }}
+      package_version:
+        description: Package version used for packaging
+        value: ${{ jobs.build-package.outputs.package_version }}
+      strategy_name:
+        description: Strategy name from config
+        value: ${{ jobs.build-package.outputs.strategy_name }}
+      latest_package_path:
+        description: Latest package path emitted by packaging script
+        value: ${{ jobs.build-package.outputs.latest_package_path }}
+      latest_package_file:
+        description: Latest package file emitted by packaging script
+        value: ${{ jobs.build-package.outputs.latest_package_file }}
+
+jobs:
+  build-package:
+    runs-on: windows-latest
+    outputs:
+      artifact_name: ${{ inputs.artifact_name }}
+      package_name: ${{ steps.package_meta.outputs.package_name }}
+      package_version: ${{ steps.package_meta.outputs.package_version }}
+      strategy_name: ${{ steps.package_meta.outputs.strategy_name }}
+      latest_package_path: ${{ steps.package.outputs.latest_package_path }}
+      latest_package_file: ${{ steps.package.outputs.latest_package_file }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Read package metadata
+        id: package_meta
+        shell: pwsh
+        run: |
+          $config = Get-Content 'src/Common/appsettings.json' | ConvertFrom-Json
+          "package_name=$($config.name)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "package_version=${{ inputs.package_version }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+          "strategy_name=$($config.strategyName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append -Encoding utf8
+
+      - name: Restore
+        run: dotnet restore ZeroTouchNinjaTrader.sln
+
+      - name: Build
+        run: dotnet build ZeroTouchNinjaTrader.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test ZeroTouchNinjaTrader.sln --configuration Release --no-build --verbosity normal
+
+      - name: Validate config
+        run: dotnet run --project src/ConfigValidatorCli/ConfigValidatorCli.csproj -- src/Common/appsettings.json
+
+      - name: Package NinjaTrader import zip
+        id: package
+        shell: pwsh
+        run: |
+          ./deploy/package-nt8.ps1 `
+            -SourceRoot "src" `
+            -OutputRoot "artifacts" `
+            -StrategyName "${{ steps.package_meta.outputs.strategy_name }}" `
+            -PackageName "${{ steps.package_meta.outputs.package_name }}" `
+            -Version "${{ steps.package_meta.outputs.package_version }}"
+
+      - name: Generate package checksums
+        shell: pwsh
+        run: |
+          $files = Get-ChildItem -Path artifacts/exports -Filter *.zip -File
+          if (-not $files) {
+            throw 'No package archives found in artifacts/exports.'
+          }
+
+          foreach ($file in $files) {
+            $hash = Get-FileHash -Path $file.FullName -Algorithm SHA256
+            "$($hash.Hash) *$($file.Name)" | Out-File -FilePath "$($file.FullName).sha256" -Encoding ascii
+          }
+
+      - name: Upload artifact
+        if: ${{ inputs.upload_artifact }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: |
+            artifacts/exports/*.zip
+            artifacts/exports/*.sha256
+            artifacts/packages/*.zip

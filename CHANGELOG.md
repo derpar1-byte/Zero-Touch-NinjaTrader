@@ -21,6 +21,8 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - Branch protection, workflow permission, and hardening guidance in project documentation.
 - Dependabot configuration for GitHub Actions updates.
 - CodeQL workflow for scheduled and PR/push static analysis.
+- Reusable build/package workflow to reduce duplication across CI and release automation.
+- MIT license file.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

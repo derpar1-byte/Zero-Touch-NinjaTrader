@@ -143,6 +143,14 @@ Runs manually:
 - copies and validates the checksum when present
 - runs post-promotion health validation that revalidates the checksum when used
 
+### `_build-package.yml`
+
+Reusable workflow used by CI and release automation:
+- restores, builds, tests, and validates the solution
+- packages the NinjaTrader artifact with a supplied version
+- generates checksum files
+- optionally uploads artifacts for downstream workflows
+
 ### `release.yml`
 
 Runs on version tags:
@@ -218,16 +226,22 @@ Recommended settings for `main`:
 Recommended GitHub Actions settings:
 - allow GitHub Actions to read repository contents by default
 - grant `contents: write` only to workflows that create releases
+- grant `security-events: write` only to CodeQL workflows that need it
 - restrict who can manually run deployment and promotion workflows
 - prefer environment-scoped secrets/variables for deploy targets
 - enable Dependabot for GitHub Actions version updates
 - enable CodeQL analysis for ongoing static security scanning
+- review reusable workflow changes with the same scrutiny as deployment code
 
 Recommended environment settings:
 - create `sim` for deployment testing if you want environment-level controls there
 - create `validated` for promotion approvals
 - require reviewers on `validated`
 - optionally add a wait timer on `validated`
+
+## License
+
+This project is licensed under the MIT License. See `LICENSE`.
 
 ## Repo-level .NET settings
 

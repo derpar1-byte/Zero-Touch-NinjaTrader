@@ -108,6 +108,19 @@ Edit `src/Common/appsettings.json`:
 }
 ```
 
+## Documentation navigation
+
+Start here based on task:
+- Daily repo overview: `README.md`
+- Full docs index: `docs/README.md`
+- Release planning: `docs/release-process.md`
+- Release/deploy day: `docs/operator-checklist.md`
+- Cutover planning: `docs/release-cutover-checklist.md`
+- Rollback operations: `docs/rollback.md`
+- Incident handling for failed promotions/rollbacks: `docs/promotion-rollback-incident-runbook.md`
+- Runner maintenance: `docs/runner-ops.md`
+- Production environment setup: `docs/production-environment-checklist.md`
+
 ## Release process
 
 Release tagging and packaging conventions are documented in `docs/release-process.md`.
@@ -136,6 +149,21 @@ Documentation index is available in `docs/README.md`.
 | `codeql.yml` | push, pull_request, weekly | GitHub-hosted Windows | static analysis and security scanning |
 | `_build-package.yml` | reusable | GitHub-hosted Windows | shared restore/build/test/package logic |
 | `_deploy-package.yml` | reusable | self-hosted Windows (`nt8`) | shared deploy/promote/rollback logic |
+
+## Workflow input/output reference
+
+| Workflow | Key inputs | Primary outputs / effects |
+| --- | --- | --- |
+| `ci.yml` | Push/PR/tag trigger | Builds, tests, packages zip artifacts, generates `.sha256`, uploads artifacts |
+| `release.yml` | Tag trigger like `v1.0.0` | Validates build, packages release artifacts, publishes GitHub Release |
+| `deploy-sim.yml` | `artifact_name`, optional `package_file`, `dry_run` | Resolves artifact/package, optionally copies to `NT8_SIM_DROP_FOLDER`, writes logs |
+| `promote.yml` | `artifact_name`, optional `package_file`, `dry_run` | Approval-gated deploy to `NT8_VALIDATED_DROP_FOLDER`, logs deployment |
+| `rollback.yml` | `artifact_name`, required `package_file`, `dry_run` | Re-deploys a prior known-good package to sim path |
+| `post-deploy-verify.yml` | target drop/log folders, checksum option | Runs `health-check.ps1`, validates deployment state |
+| `promote-production.yml` | `artifact_name`, optional `package_file`, `dry_run` | Approval-gated production deploy to `NT8_PRODUCTION_DROP_FOLDER` |
+| `rollback-production.yml` | `artifact_name`, required `package_file`, `dry_run` | Re-deploys a prior known-good production package |
+| `_build-package.yml` | package version, artifact upload option | Reusable build/package/checksum workflow |
+| `_deploy-package.yml` | artifact/package selection, drop/log folders, checksum requirement, `dry_run` | Reusable deployment resolution/copy/verification flow |
 
 ## Workflow overview
 

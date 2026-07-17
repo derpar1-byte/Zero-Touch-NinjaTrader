@@ -43,6 +43,9 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - Production rollback workflow scaffold.
 - Release cutover checklist documentation.
 - Documentation index page under `docs/README.md`.
+- Root README documentation navigation section.
+- Workflow input/output reference table in README.
+- Incident response runbook for failed promotions and rollbacks.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

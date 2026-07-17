@@ -15,6 +15,7 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - Centralized repo-level .NET settings via `global.json` and `Directory.Build.props`.
 - Runner setup documentation and NT8 deployment variable guidance.
 - Basic config validation library, CLI, and unit tests.
+- PR template, issue templates, and `CODEOWNERS` governance scaffolding.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

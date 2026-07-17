@@ -1,0 +1,9 @@
+* @derpar1-byte
+
+.github/workflows/* @derpar1-byte
+.github/ISSUE_TEMPLATE/* @derpar1-byte
+deploy/* @derpar1-byte
+src/* @derpar1-byte
+tests/* @derpar1-byte
+README.md @derpar1-byte
+CHANGELOG.md @derpar1-byte

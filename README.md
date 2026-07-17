@@ -181,6 +181,12 @@ src/Indicators/        indicator scaffold placeholders
 tests/Common.Tests/    unit tests
 ```
 
+## Repository governance
+
+- `CODEOWNERS` assigns default review ownership for workflows, deploy scripts, source, tests, and docs.
+- Pull requests use `.github/pull_request_template.md`.
+- Issues use the YAML forms under `.github/ISSUE_TEMPLATE/`.
+
 ## Repo-level .NET settings
 
 This repository includes:

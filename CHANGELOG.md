@@ -40,6 +40,9 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - Production promotion workflow scaffold.
 - Production environment checklist documentation.
 - README badges for post-deploy verification and production promotion workflows.
+- Production rollback workflow scaffold.
+- Release cutover checklist documentation.
+- Documentation index page under `docs/README.md`.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

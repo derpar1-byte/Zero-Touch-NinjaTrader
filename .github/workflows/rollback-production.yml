@@ -1,0 +1,30 @@
+name: rollback-production
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_name:
+        description: Artifact name from CI or release
+        required: false
+        default: zerotouch-package
+      package_file:
+        description: Specific previous package file name inside the artifact directory
+        required: true
+        default: ''
+      dry_run:
+        description: Resolve package/checksum without copying files
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  rollback-production:
+    environment: production
+    uses: ./.github/workflows/_deploy-package.yml
+    with:
+      artifact_name: ${{ inputs.artifact_name }}
+      package_file: ${{ inputs.package_file }}
+      drop_folder: ${{ vars.NT8_PRODUCTION_DROP_FOLDER }}
+      log_folder: ${{ vars.NT8_LOG_FOLDER }}
+      require_checksum: true
+      dry_run: ${{ inputs.dry_run }}

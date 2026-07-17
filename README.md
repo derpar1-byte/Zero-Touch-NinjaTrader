@@ -5,6 +5,7 @@
 [![Rollback](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/rollback.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/rollback.yml)
 [![Post-Deploy Verify](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/post-deploy-verify.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/post-deploy-verify.yml)
 [![Promote Production](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/promote-production.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/promote-production.yml)
+[![Rollback Production](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/rollback-production.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/rollback-production.yml)
 [![CodeQL](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml)
 
 # Zero-Touch-NinjaTrader
@@ -116,7 +117,9 @@ Production environment guidance is documented in `docs/production-environment-ch
 Rollback guidance is documented in `docs/rollback.md`.
 Runner maintenance guidance is documented in `docs/runner-ops.md`.
 Release/deploy day guidance is documented in `docs/operator-checklist.md`.
+Production cutover guidance is documented in `docs/release-cutover-checklist.md`.
 Post-deploy verification guidance is documented in `docs/post-deploy-checklist.md`.
+Documentation index is available in `docs/README.md`.
 
 ## Workflow summary table
 
@@ -128,6 +131,7 @@ Post-deploy verification guidance is documented in `docs/post-deploy-checklist.m
 | `promote.yml` | manual | self-hosted Windows (`nt8`) | promote artifact to validated target with approval gate |
 | `promote-production.yml` | manual | self-hosted Windows (`nt8`) | promote validated artifact to production target with stricter gate |
 | `rollback.yml` | manual | self-hosted Windows (`nt8`) | redeploy a previous known-good artifact |
+| `rollback-production.yml` | manual | self-hosted Windows (`nt8`) | redeploy a previous known-good artifact to production |
 | `post-deploy-verify.yml` | manual | self-hosted Windows (`nt8`) | rerun post-deploy health and checksum verification |
 | `codeql.yml` | push, pull_request, weekly | GitHub-hosted Windows | static analysis and security scanning |
 | `_build-package.yml` | reusable | GitHub-hosted Windows | shared restore/build/test/package logic |
@@ -206,6 +210,15 @@ Runs manually:
 - defaults to `dry_run = true` for safer first execution
 - is intended for a later validated-to-production promotion stage
 - uses `NT8_PRODUCTION_DROP_FOLDER` and requires checksum verification
+
+### `rollback-production.yml`
+
+Runs manually:
+- targets GitHub Environment `production`
+- redeploys a prior known-good production artifact
+- defaults to `dry_run = true` for safer first execution
+- requires checksum verification
+- is intended to pair with `docs/release-cutover-checklist.md`
 
 ### `post-deploy-verify.yml`
 

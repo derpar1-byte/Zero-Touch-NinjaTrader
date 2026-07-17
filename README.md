@@ -3,6 +3,8 @@
 [![Deploy Sim](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/deploy-sim.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/deploy-sim.yml)
 [![Promote](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/promote.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/promote.yml)
 [![Rollback](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/rollback.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/rollback.yml)
+[![Post-Deploy Verify](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/post-deploy-verify.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/post-deploy-verify.yml)
+[![Promote Production](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/promote-production.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/promote-production.yml)
 [![CodeQL](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml)
 
 # Zero-Touch-NinjaTrader
@@ -74,6 +76,7 @@ Set these GitHub variables for the self-hosted deployment workflows:
 
 - `NT8_SIM_DROP_FOLDER` — destination folder for sim packages
 - `NT8_VALIDATED_DROP_FOLDER` — destination folder for approved promotion packages
+- `NT8_PRODUCTION_DROP_FOLDER` — destination folder for production promotion packages
 - `NT8_LOG_FOLDER` — deployment log folder
 - `NT8_STAGING_FOLDER` — optional temporary packaging workspace
 - `NT8_EXPORTS_FOLDER` — optional output folder for packaged zip files
@@ -109,6 +112,7 @@ Edit `src/Common/appsettings.json`:
 Release tagging and packaging conventions are documented in `docs/release-process.md`.
 Hotfix guidance is documented in `docs/hotfix-process.md`.
 Promotion path guidance is documented in `docs/promotion-model.md`.
+Production environment guidance is documented in `docs/production-environment-checklist.md`.
 Rollback guidance is documented in `docs/rollback.md`.
 Runner maintenance guidance is documented in `docs/runner-ops.md`.
 Release/deploy day guidance is documented in `docs/operator-checklist.md`.
@@ -122,6 +126,7 @@ Post-deploy verification guidance is documented in `docs/post-deploy-checklist.m
 | `release.yml` | `v*` tag | GitHub-hosted Windows | package release artifacts and publish GitHub Release |
 | `deploy-sim.yml` | manual | self-hosted Windows (`nt8`) | deploy selected artifact to sim target |
 | `promote.yml` | manual | self-hosted Windows (`nt8`) | promote artifact to validated target with approval gate |
+| `promote-production.yml` | manual | self-hosted Windows (`nt8`) | promote validated artifact to production target with stricter gate |
 | `rollback.yml` | manual | self-hosted Windows (`nt8`) | redeploy a previous known-good artifact |
 | `post-deploy-verify.yml` | manual | self-hosted Windows (`nt8`) | rerun post-deploy health and checksum verification |
 | `codeql.yml` | push, pull_request, weekly | GitHub-hosted Windows | static analysis and security scanning |
@@ -192,6 +197,15 @@ Runs manually:
 - redeploys a specific previously known package file
 - defaults to `dry_run = true` for safer first execution
 - can be used to validate rollback resolution before copying files
+
+### `promote-production.yml`
+
+Runs manually:
+- targets GitHub Environment `production`
+- uses the shared reusable deploy workflow
+- defaults to `dry_run = true` for safer first execution
+- is intended for a later validated-to-production promotion stage
+- uses `NT8_PRODUCTION_DROP_FOLDER` and requires checksum verification
 
 ### `post-deploy-verify.yml`
 

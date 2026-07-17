@@ -37,6 +37,9 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - Hotfix process documentation.
 - Staged promotion model documentation for validated-to-production evolution.
 - Workflow summary table in the README.
+- Production promotion workflow scaffold.
+- Production environment checklist documentation.
+- README badges for post-deploy verification and production promotion workflows.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

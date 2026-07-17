@@ -1,0 +1,36 @@
+name: Promote Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      artifact_name:
+        description: Artifact bundle name from CI or release workflow
+        required: true
+        type: string
+      package_file:
+        description: Specific package file name inside the artifact directory
+        required: false
+        default: ''
+        type: string
+      dry_run:
+        description: Resolve package/checksum without copying files
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+jobs:
+  promote-production:
+    name: Promote to production
+    uses: ./.github/workflows/_deploy-package.yml
+    with:
+      environment_name: production
+      artifact_name: ${{ inputs.artifact_name }}
+      package_file: ${{ inputs.package_file }}
+      drop_folder: ${{ vars.NT8_PRODUCTION_DROP_FOLDER }}
+      log_folder: ${{ vars.NT8_LOG_FOLDER }}
+      require_checksum: true
+      dry_run: ${{ inputs.dry_run }}
+    secrets: inherit

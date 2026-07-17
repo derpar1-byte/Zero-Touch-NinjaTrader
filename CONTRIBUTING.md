@@ -37,14 +37,19 @@ also verify that:
 - checksum generation still works
 - README examples remain accurate
 
-### Deployment and promotion
+### Deployment, promotion, and rollback
 
 When changing:
 - `.github/workflows/deploy-sim.yml`
 - `.github/workflows/promote.yml`
+- `.github/workflows/rollback.yml`
+- `.github/workflows/_deploy-package.yml`
 - `deploy/deploy-sim.ps1`
 - `deploy/health-check.ps1`
 - workflow permissions or environment usage
+- `docs/release-process.md`
+- `docs/rollback.md`
+- `docs/runner-ops.md`
 
 also verify that:
 - self-hosted runner labels are still correct
@@ -52,6 +57,8 @@ also verify that:
 - checksum validation behavior remains consistent
 - log output is still usable for operators
 - the workflow token permissions are still minimal for the task
+- dry-run validation still works
+- rollback guidance still matches real workflow behavior
 
 ## Code review
 

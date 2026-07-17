@@ -27,6 +27,22 @@ This repository uses lightweight semantic versioning with Git tags to drive rele
 5. `release.yml` runs automatically.
 6. GitHub Release is created with packaged artifacts and checksum files.
 
+## Release notes
+
+Use `.github/release-notes-template.md` as the starting point for GitHub Release notes.
+Capture at minimum:
+- summary
+- added/changed/fixed/security items
+- deployment notes
+- upgrade or rollback guidance
+
+## Rollback readiness
+
+Before tagging an important release:
+- confirm the prior known-good artifact is still available
+- confirm checksum artifacts exist for the current release
+- confirm `rollback.yml` can resolve a prior package in dry-run mode when needed
+
 ## Tag examples
 
 Create and push `v1.0.0`:

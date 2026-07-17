@@ -37,13 +37,13 @@ Recommended baseline practices:
 - protect `main` with pull requests and required checks
 - require reviewers for the `validated` environment
 - keep the self-hosted runner dedicated to this workflow when possible
-- restrict who can dispatch deployment and promotion workflows
+- restrict who can dispatch deployment, promotion, and rollback workflows
 - validate checksum files before moving deployment artifacts
 - keep .NET and PowerShell updated on the runner machine
 - avoid storing secrets directly in repository files
 - prefer environment variables/secrets over hardcoded machine-specific values
 - give workflows the minimum required token permissions
-- review any change to `.github/workflows/` and `deploy/` as security-sensitive
+- review any change to `.github/workflows/`, `deploy/`, and `docs/` operational runbooks as security-sensitive
 
 ## Workflow dispatch and permissions guidance
 

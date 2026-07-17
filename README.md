@@ -186,6 +186,8 @@ tests/Common.Tests/    unit tests
 - `CODEOWNERS` assigns default review ownership for workflows, deploy scripts, source, tests, and docs.
 - Pull requests use `.github/pull_request_template.md`.
 - Issues use the YAML forms under `.github/ISSUE_TEMPLATE/`.
+- Contribution expectations are documented in `CONTRIBUTING.md`.
+- Security reporting and hardening guidance are documented in `SECURITY.md`.
 
 ## Repo-level .NET settings
 

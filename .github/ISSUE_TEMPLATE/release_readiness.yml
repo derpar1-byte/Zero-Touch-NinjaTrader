@@ -1,0 +1,53 @@
+name: Release readiness
+description: Prepare and verify a version before tagging and/or promotion.
+title: "Release readiness: v"
+labels:
+  - release
+  - operations
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Target version
+      description: Semantic version tag, for example v1.0.0
+      placeholder: v1.0.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope summary
+      description: Describe the user-facing scope of this release.
+      placeholder: Summary of changes, risk, and intended outcome.
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: readiness
+    attributes:
+      label: Readiness checklist
+      options:
+        - label: CI is green on main
+        - label: Release notes draft is prepared
+        - label: Checksum artifacts are expected and documented
+        - label: Sim deployment dry run completed
+        - label: Sim deployment completed successfully
+        - label: Promotion approvers are identified
+        - label: Rollback target is known
+        - label: Runner health was checked
+
+  - type: textarea
+    id: rollback
+    attributes:
+      label: Rollback plan
+      description: Identify the known-good artifact/package and any environment notes.
+      placeholder: Artifact name, package file, checksum notes, runner/environment notes.
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional notes
+      description: Include links to PRs, incidents, releases, or operator notes.

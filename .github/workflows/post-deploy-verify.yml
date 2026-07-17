@@ -1,0 +1,33 @@
+name: post-deploy-verify
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment_name:
+        description: Logical environment name for operator notes
+        required: true
+        default: sim
+      drop_folder:
+        description: Target folder to inspect on the runner
+        required: true
+      log_folder:
+        description: Log folder to inspect on the runner
+        required: true
+      require_checksum:
+        description: Require matching checksum validation
+        required: false
+        default: true
+        type: boolean
+
+jobs:
+  verify:
+    runs-on: [self-hosted, windows, nt8]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Verify deployment state
+        shell: pwsh
+        run: |
+          Write-Host "Environment: ${{ inputs.environment_name }}"
+          ./deploy/health-check.ps1 -DropFolder "${{ inputs.drop_folder }}" -LogFolder "${{ inputs.log_folder }}" -RequireChecksum:${{ inputs.require_checksum }}

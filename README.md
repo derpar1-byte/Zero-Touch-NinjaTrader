@@ -109,6 +109,8 @@ Edit `src/Common/appsettings.json`:
 Release tagging and packaging conventions are documented in `docs/release-process.md`.
 Rollback guidance is documented in `docs/rollback.md`.
 Runner maintenance guidance is documented in `docs/runner-ops.md`.
+Release/deploy day guidance is documented in `docs/operator-checklist.md`.
+Post-deploy verification guidance is documented in `docs/post-deploy-checklist.md`.
 
 ## Workflow overview
 
@@ -174,6 +176,13 @@ Runs manually:
 - redeploys a specific previously known package file
 - defaults to `dry_run = true` for safer first execution
 - can be used to validate rollback resolution before copying files
+
+### `post-deploy-verify.yml`
+
+Runs manually on the Windows self-hosted runner:
+- executes `deploy/health-check.ps1` against a chosen drop/log folder pair
+- can require checksum validation
+- provides a lightweight verification pass after deploy, promote, or rollback
 
 ### `_build-package.yml`
 
@@ -244,6 +253,7 @@ tests/Common.Tests/    unit tests
 - Issues use the YAML forms under `.github/ISSUE_TEMPLATE/`.
 - Contribution expectations are documented in `CONTRIBUTING.md`.
 - Security reporting and hardening guidance are documented in `SECURITY.md`.
+- Release readiness can be tracked with `.github/ISSUE_TEMPLATE/release_readiness.yml`.
 
 ## Branch protection and repository settings checklist
 

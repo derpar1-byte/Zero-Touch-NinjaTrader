@@ -31,6 +31,9 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - Rollback workflow and rollback operations documentation.
 - GitHub release notes template.
 - Windows self-hosted runner operations playbook.
+- Release/deploy day operator checklist.
+- Release readiness issue template.
+- Post-deploy verification workflow and checklist.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

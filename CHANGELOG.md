@@ -46,6 +46,9 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - Root README documentation navigation section.
 - Workflow input/output reference table in README.
 - Incident response runbook for failed promotions and rollbacks.
+- Docs reading-order/sidebar section in `docs/README.md`.
+- Example release notes for `v1.0.0`.
+- Workflow troubleshooting matrix by symptom.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

@@ -118,8 +118,10 @@ Start here based on task:
 - Cutover planning: `docs/release-cutover-checklist.md`
 - Rollback operations: `docs/rollback.md`
 - Incident handling for failed promotions/rollbacks: `docs/promotion-rollback-incident-runbook.md`
+- Workflow failure troubleshooting: `docs/workflow-troubleshooting-matrix.md`
 - Runner maintenance: `docs/runner-ops.md`
 - Production environment setup: `docs/production-environment-checklist.md`
+- Release notes example: `docs/release-notes-v1.0.0-example.md`
 
 ## Release process
 

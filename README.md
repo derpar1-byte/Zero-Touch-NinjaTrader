@@ -107,10 +107,26 @@ Edit `src/Common/appsettings.json`:
 ## Release process
 
 Release tagging and packaging conventions are documented in `docs/release-process.md`.
+Hotfix guidance is documented in `docs/hotfix-process.md`.
+Promotion path guidance is documented in `docs/promotion-model.md`.
 Rollback guidance is documented in `docs/rollback.md`.
 Runner maintenance guidance is documented in `docs/runner-ops.md`.
 Release/deploy day guidance is documented in `docs/operator-checklist.md`.
 Post-deploy verification guidance is documented in `docs/post-deploy-checklist.md`.
+
+## Workflow summary table
+
+| Workflow | Trigger | Runner | Purpose |
+|---|---|---|---|
+| `ci.yml` | push, pull_request, tag | GitHub-hosted Windows | restore, build, test, validate, package, upload artifacts |
+| `release.yml` | `v*` tag | GitHub-hosted Windows | package release artifacts and publish GitHub Release |
+| `deploy-sim.yml` | manual | self-hosted Windows (`nt8`) | deploy selected artifact to sim target |
+| `promote.yml` | manual | self-hosted Windows (`nt8`) | promote artifact to validated target with approval gate |
+| `rollback.yml` | manual | self-hosted Windows (`nt8`) | redeploy a previous known-good artifact |
+| `post-deploy-verify.yml` | manual | self-hosted Windows (`nt8`) | rerun post-deploy health and checksum verification |
+| `codeql.yml` | push, pull_request, weekly | GitHub-hosted Windows | static analysis and security scanning |
+| `_build-package.yml` | reusable | GitHub-hosted Windows | shared restore/build/test/package logic |
+| `_deploy-package.yml` | reusable | self-hosted Windows (`nt8`) | shared deploy/promote/rollback logic |
 
 ## Workflow overview
 

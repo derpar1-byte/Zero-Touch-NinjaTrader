@@ -34,6 +34,9 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - Release/deploy day operator checklist.
 - Release readiness issue template.
 - Post-deploy verification workflow and checklist.
+- Hotfix process documentation.
+- Staged promotion model documentation for validated-to-production evolution.
+- Workflow summary table in the README.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

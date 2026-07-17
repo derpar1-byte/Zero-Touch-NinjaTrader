@@ -49,6 +49,9 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - Docs reading-order/sidebar section in `docs/README.md`.
 - Example release notes for `v1.0.0`.
 - Workflow troubleshooting matrix by symptom.
+- FAQ documentation.
+- Workflow permissions matrix.
+- End-to-end first release walkthrough for `v1.0.0`.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

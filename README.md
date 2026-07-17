@@ -114,11 +114,13 @@ Start here based on task:
 - Daily repo overview: `README.md`
 - Full docs index: `docs/README.md`
 - Release planning: `docs/release-process.md`
+- First tagged release walkthrough: `docs/first-release-v1.0.0-walkthrough.md`
 - Release/deploy day: `docs/operator-checklist.md`
 - Cutover planning: `docs/release-cutover-checklist.md`
 - Rollback operations: `docs/rollback.md`
 - Incident handling for failed promotions/rollbacks: `docs/promotion-rollback-incident-runbook.md`
 - Workflow failure troubleshooting: `docs/workflow-troubleshooting-matrix.md`
+- Workflow permission model: `docs/workflow-permissions-matrix.md`
 - Runner maintenance: `docs/runner-ops.md`
 - Production environment setup: `docs/production-environment-checklist.md`
 - Release notes example: `docs/release-notes-v1.0.0-example.md`

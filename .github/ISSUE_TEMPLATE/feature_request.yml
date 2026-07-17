@@ -1,0 +1,36 @@
+name: Feature request
+description: Propose an improvement for Zero-Touch-NinjaTrader workflows, packaging, or deployment.
+title: "feat: "
+labels:
+  - enhancement
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: What pain point or limitation are you addressing?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed solution
+      description: Describe the change you want.
+    validations:
+      required: true
+  - type: textarea
+    id: impact
+    attributes:
+      label: Expected impact
+      description: CI, packaging, runner operations, promotion safety, or documentation impact.
+  - type: checkboxes
+    id: areas
+    attributes:
+      label: Relevant areas
+      options:
+        - label: CI / GitHub Actions
+        - label: Packaging
+        - label: Deploy Sim
+        - label: Promotion / Approval Gate
+        - label: Runner Setup
+        - label: Documentation

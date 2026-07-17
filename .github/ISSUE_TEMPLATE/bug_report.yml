@@ -1,0 +1,47 @@
+name: Bug report
+description: Report a defect in Zero-Touch-NinjaTrader workflows, packaging, or deployment.
+title: "bug: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What happened?
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include commands, workflow names, runner context, and package names.
+      placeholder: |
+        1. Run workflow...
+        2. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - CI
+        - Packaging
+        - Deploy Sim
+        - Promote
+        - Self-hosted Runner
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs or errors
+      render: shell

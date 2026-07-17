@@ -28,6 +28,9 @@ and this project loosely follows [Semantic Versioning](https://semver.org/).
 - Semantic release process documentation with tag examples.
 - Visible README status badges for deploy and promote workflows.
 - Dry-run mode for reusable deployment workflow validation.
+- Rollback workflow and rollback operations documentation.
+- GitHub release notes template.
+- Windows self-hosted runner operations playbook.
 
 ### Fixed
 - xUnit test compilation by restoring the required `using Xunit;` import.

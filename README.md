@@ -2,6 +2,7 @@
 [![Release](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/release.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/release.yml)
 [![Deploy Sim](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/deploy-sim.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/deploy-sim.yml)
 [![Promote](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/promote.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/promote.yml)
+[![Rollback](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/rollback.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/rollback.yml)
 [![CodeQL](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml/badge.svg)](https://github.com/derpar1-byte/Zero-Touch-NinjaTrader/actions/workflows/codeql.yml)
 
 # Zero-Touch-NinjaTrader
@@ -106,6 +107,8 @@ Edit `src/Common/appsettings.json`:
 ## Release process
 
 Release tagging and packaging conventions are documented in `docs/release-process.md`.
+Rollback guidance is documented in `docs/rollback.md`.
+Runner maintenance guidance is documented in `docs/runner-ops.md`.
 
 ## Workflow overview
 
@@ -159,9 +162,18 @@ Runs manually:
 - downloads a selected artifact
 - resolves either a specific package file or the newest `*-latest.zip`
 - discovers a matching `<package>.zip.sha256` file when present
+- supports `dry_run` for approval-path validation without copying files
 - copies package to the validated drop folder
 - copies and validates the checksum when present
 - runs post-promotion health validation that revalidates the checksum when used
+
+### `rollback.yml`
+
+Runs manually:
+- targets GitHub Environment `validated`
+- redeploys a specific previously known package file
+- defaults to `dry_run = true` for safer first execution
+- can be used to validate rollback resolution before copying files
 
 ### `_build-package.yml`
 
@@ -248,11 +260,12 @@ Recommended GitHub Actions settings:
 - allow GitHub Actions to read repository contents by default
 - grant `contents: write` only to workflows that create releases
 - grant `security-events: write` only to CodeQL workflows that need it
-- restrict who can manually run deployment and promotion workflows
+- restrict who can manually run deployment, rollback, and promotion workflows
 - prefer environment-scoped secrets/variables for deploy targets
 - enable Dependabot for GitHub Actions version updates
 - enable CodeQL analysis for ongoing static security scanning
 - review reusable workflow changes with the same scrutiny as deployment code
+- keep rollback and promote permissions limited to trusted maintainers
 
 Recommended environment settings:
 - create `sim` for deployment testing if you want environment-level controls there

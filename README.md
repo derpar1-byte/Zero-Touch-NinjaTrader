@@ -10,457 +10,139 @@
 
 # Zero-Touch-NinjaTrader
 
-GitHub Actions automation scaffold for a NinjaTrader 8 strategy delivery pipeline with build validation, packaging, simulated deployment, and supervised promotion gates.
+.NET 8 and PowerShell starter for a NinjaTrader 8 delivery pipeline: validate package config, stage NinjaTrader-compatible source payloads, package zip/checksum artifacts, deploy to sim, promote with gates, verify health, and support rollback scaffolds.
 
 ## What this repository provides
 
-- .NET solution for shared config and validation logic
-- GitHub Actions CI workflow for restore, build, test, config validation, and packaging
-- Windows self-hosted runner deployment workflow for sim/paper delivery
-- Promotion workflow with manual approval through GitHub Environments
-- PowerShell packaging script for NinjaTrader-style import/export zip artifacts
-- Basic health checks and deployment logging
-- checksum verification during deploy/promote when `.sha256` files are supplied
-- health checks that can require checksum presence
+- .NET solution with shared config validation, artifact naming helpers, packaging manifest generation, and CLI validation.
+- NinjaTrader-style package staging under `NinjaTrader 8/bin/Custom/Strategies`, `NinjaTrader 8/bin/Custom/Indicators`, and `AddOnContent`.
+- PowerShell scripts for deterministic packaging, checksum generation, dry-run deployment, checksum validation, structured logs, and health checks.
+- GitHub Actions workflows for CI, tag releases, sim deploy, validated promotion, production promotion scaffolds, rollback, and post-deploy verification.
+- Operator docs for release, hotfix, rollback, runner ops, troubleshooting, permissions, and artifact naming.
 
 ## Repository layout
 
 ```text
-.github/workflows/
-  ci.yml
-  deploy-sim.yml
-  promote.yml
-deploy/
-  deploy-sim.ps1
-  health-check.ps1
-  package-nt8.ps1
-src/
-  Common/
-  ConfigValidatorCli/
-tests/
-  Common.Tests/
+.github/workflows/        CI, release, deploy, promote, rollback, and reusable workflows
+config/                   package/deployment config used by scripts and CLI validation
+deploy/                   package, deploy, and health-check PowerShell scripts
+docs/                     operator and workflow documentation
+src/Common/               config model, validation, version/artifact/checksum helpers
+src/Strategy/             strategy metadata scaffold
+src/Indicators/           indicator metadata scaffold, plus PositionExporter.cs
+                          (a real, hand-written NinjaScript indicator for the
+                          Northstar NT8 bridge -- NOT staged by src/Packaging/;
+                          import it manually, see the file's header comment)
+src/Packaging/            manifest and NinjaTrader payload staging service
+src/ConfigValidatorCli/   CLI config validator
+tests/Common.Tests/       fast deterministic unit tests
 ZeroTouchNinjaTrader.sln
 ```
 
 ## Prerequisites
 
-### GitHub
-
-- A GitHub repository containing this project
-- Actions enabled
-- A GitHub Environment named `sim`
-- A GitHub Environment named `validated` for promotion approvals
-- Required reviewers configured on `validated` if you want a manual approval gate
-
-### Runner machine
-
-Use a Windows self-hosted runner for deployment steps that interact with NinjaTrader conventions.
-
-Install on the runner machine:
-- .NET 8 SDK and .NET 8 runtime
-- PowerShell 7+ recommended
-- NinjaTrader 8
-- GitHub Actions self-hosted runner service
-
-Recommended folders on the runner:
-- `C:\NinjaTraderDeploy\Import`
-- `C:\NinjaTraderDeploy\Validated`
-- `C:\NinjaTraderDeploy\Logs`
-- `C:\NinjaTraderDeploy\Staging`
-- `C:\NinjaTraderDeploy\Exports`
+- .NET 8 SDK
+- PowerShell 7+ recommended, Windows PowerShell works for local scripts
+- Windows self-hosted GitHub runner with labels `self-hosted`, `windows`, `nt8` for deploy/promote jobs
+- NinjaTrader 8 on operator machines that will manually import the generated zip
 
 ## Configuration
 
-### Repository or environment variables
-
-Set these GitHub variables for the self-hosted deployment workflows:
-
-- `NT8_SIM_DROP_FOLDER` — destination folder for sim packages
-- `NT8_VALIDATED_DROP_FOLDER` — destination folder for approved promotion packages
-- `NT8_PRODUCTION_DROP_FOLDER` — destination folder for production promotion packages
-- `NT8_LOG_FOLDER` — deployment log folder
-- `NT8_STAGING_FOLDER` — optional temporary packaging workspace
-- `NT8_EXPORTS_FOLDER` — optional output folder for packaged zip files
-
-Example values:
-
-```text
-NT8_SIM_DROP_FOLDER=C:\NinjaTraderDeploy\Import
-NT8_VALIDATED_DROP_FOLDER=C:\NinjaTraderDeploy\Validated
-NT8_LOG_FOLDER=C:\NinjaTraderDeploy\Logs
-NT8_STAGING_FOLDER=C:\NinjaTraderDeploy\Staging
-NT8_EXPORTS_FOLDER=C:\NinjaTraderDeploy\Exports
-```
-
-### Application config
-
-Edit `src/Common/appsettings.json`:
+Edit `config/deploy-settings.json`:
 
 ```json
 {
-  "name": "ZeroTouchNinjaTrader",
-  "version": "1.0.0",
-  "strategyName": "SampleStrategy",
+  "packageName": "ZeroTouchNinjaTrader",
+  "version": "0.1.0",
+  "strategyName": "ZeroTouchSampleStrategy",
+  "indicatorNames": ["ZeroTouchTrendFilter", "ZeroTouchRiskMeter"],
   "targetEnvironment": "sim",
   "artifactRoot": "artifacts",
-  "dropFolder": "C:\\NinjaTraderDeploy\\Import",
-  "logFolder": "C:\\NinjaTraderDeploy\\Logs"
+  "exportRoot": "artifacts/export",
+  "packageRoot": "artifacts/package",
+  "dropFolder": "artifacts/sim-drop",
+  "logFolder": "artifacts/logs",
+  "ninjaTraderRelativeRoot": "NinjaTrader 8/bin/Custom"
 }
 ```
 
-## Documentation navigation
-
-Start here based on task:
-- Daily repo overview: `README.md`
-- Full docs index: `docs/README.md`
-- Release planning: `docs/release-process.md`
-- First tagged release walkthrough: `docs/first-release-v1.0.0-walkthrough.md`
-- Release/deploy day: `docs/operator-checklist.md`
-- Cutover planning: `docs/release-cutover-checklist.md`
-- Rollback operations: `docs/rollback.md`
-- Incident handling for failed promotions/rollbacks: `docs/promotion-rollback-incident-runbook.md`
-- Workflow failure troubleshooting: `docs/workflow-troubleshooting-matrix.md`
-- Workflow permission model: `docs/workflow-permissions-matrix.md`
-- Artifact naming reference: `docs/release-artifact-naming-reference.md`
-- Runner maintenance: `docs/runner-ops.md`
-- Production environment setup: `docs/production-environment-checklist.md`
-- Release notes example: `docs/release-notes-v1.0.0-example.md`
-- Artifact naming reference: `docs/release-artifact-naming-reference.md`
-- Support and contact paths: `SUPPORT.md`
-- Shared terminology: `docs/glossary.md`
-- Support and help path: `SUPPORT.md`
-
-## Release process
-
-Release tagging and packaging conventions are documented in `docs/release-process.md`.
-Hotfix guidance is documented in `docs/hotfix-process.md`.
-Promotion path guidance is documented in `docs/promotion-model.md`.
-Production environment guidance is documented in `docs/production-environment-checklist.md`.
-Rollback guidance is documented in `docs/rollback.md`.
-Runner maintenance guidance is documented in `docs/runner-ops.md`.
-Release/deploy day guidance is documented in `docs/operator-checklist.md`.
-Production cutover guidance is documented in `docs/release-cutover-checklist.md`.
-Post-deploy verification guidance is documented in `docs/post-deploy-checklist.md`.
-Documentation index is available in `docs/README.md`.
-
-## Workflow summary table
-
-| Workflow | Trigger | Runner | Purpose |
-|---|---|---|---|
-| `ci.yml` | push, pull_request, tag | GitHub-hosted Windows | restore, build, test, validate, package, upload artifacts |
-| `release.yml` | `v*` tag | GitHub-hosted Windows | package release artifacts and publish GitHub Release |
-| `deploy-sim.yml` | manual | self-hosted Windows (`nt8`) | deploy selected artifact to sim target |
-| `promote.yml` | manual | self-hosted Windows (`nt8`) | promote artifact to validated target with approval gate |
-| `promote-production.yml` | manual | self-hosted Windows (`nt8`) | promote validated artifact to production target with stricter gate |
-| `rollback.yml` | manual | self-hosted Windows (`nt8`) | redeploy a previous known-good artifact |
-| `rollback-production.yml` | manual | self-hosted Windows (`nt8`) | redeploy a previous known-good artifact to production |
-| `post-deploy-verify.yml` | manual | self-hosted Windows (`nt8`) | rerun post-deploy health and checksum verification |
-| `codeql.yml` | push, pull_request, weekly | GitHub-hosted Windows | static analysis and security scanning |
-| `_build-package.yml` | reusable | GitHub-hosted Windows | shared restore/build/test/package logic |
-| `_deploy-package.yml` | reusable | self-hosted Windows (`nt8`) | shared deploy/promote/rollback logic |
-
-## Workflow input/output reference
-
-| Workflow | Key inputs | Primary outputs / effects |
-| --- | --- | --- |
-| `ci.yml` | Push/PR/tag trigger | Builds, tests, packages zip artifacts, generates `.sha256`, uploads artifacts |
-| `release.yml` | Tag trigger like `v1.0.0` | Validates build, packages release artifacts, publishes GitHub Release |
-| `deploy-sim.yml` | `artifact_name`, optional `package_file`, `dry_run` | Resolves artifact/package, optionally copies to `NT8_SIM_DROP_FOLDER`, writes logs |
-| `promote.yml` | `artifact_name`, optional `package_file`, `dry_run` | Approval-gated deploy to `NT8_VALIDATED_DROP_FOLDER`, logs deployment |
-| `rollback.yml` | `artifact_name`, required `package_file`, `dry_run` | Re-deploys a prior known-good package to sim path |
-| `post-deploy-verify.yml` | target drop/log folders, checksum option | Runs `health-check.ps1`, validates deployment state |
-| `promote-production.yml` | `artifact_name`, optional `package_file`, `dry_run` | Approval-gated production deploy to `NT8_PRODUCTION_DROP_FOLDER` |
-| `rollback-production.yml` | `artifact_name`, required `package_file`, `dry_run` | Re-deploys a prior known-good production package |
-| `_build-package.yml` | package version, artifact upload option | Reusable build/package/checksum workflow |
-| `_deploy-package.yml` | artifact/package selection, drop/log folders, checksum requirement, `dry_run` | Reusable deployment resolution/copy/verification flow |
-
-## Workflow overview
-
-### `ci.yml`
-
-Runs on push, pull request, and version tags:
-- restore solution
-- build solution
-- run tests
-- validate config
-- read package metadata from `appsettings.json`
-- package NinjaTrader payload into versioned and latest zip artifacts
-- upload build artifacts
-
-Artifact outputs include:
-- `artifacts/exports/<package>-<strategy>-<version>-<timestamp>.zip`
-- `artifacts/exports/<package>-<strategy>-<version>-<timestamp>.zip.sha256`
-- `artifacts/packages/<package>-<strategy>-latest.zip`
-
-### `_deploy-package.yml`
-
-Reusable workflow used by manual deployment and promotion:
-- downloads the selected artifact bundle
-- resolves the requested package file or newest `*-latest.zip`
-- resolves and verifies the matching checksum file when present
-- supports `dry_run` mode for first-time runner validation without copying files
-- copies package/checksum to the target Windows drop folder when not in dry run
-- runs post-deploy health checks with optional checksum enforcement
-
-### `deploy-sim.yml`
-
-Runs manually:
-- downloads a selected artifact bundle from CI
-- resolves either a specific package file or the newest `*-latest.zip`
-- discovers a matching `<package>.zip.sha256` file when present
-- copies package to the sim drop folder on the Windows runner
-- copies and validates the checksum when present
-- writes deployment logs
-- runs a post-deploy health check that revalidates the checksum when used
-
-Runner labels expected:
-- `self-hosted`
-- `windows`
-- `nt8`
-
-### `promote.yml`
-
-Runs manually:
-- targets GitHub Environment `validated`
-- pauses for manual approval if required reviewers are configured
-- downloads a selected artifact
-- resolves either a specific package file or the newest `*-latest.zip`
-- discovers a matching `<package>.zip.sha256` file when present
-- supports `dry_run` for approval-path validation without copying files
-- copies package to the validated drop folder
-- copies and validates the checksum when present
-- runs post-promotion health validation that revalidates the checksum when used
-
-### `rollback.yml`
-
-Runs manually:
-- targets GitHub Environment `validated`
-- redeploys a specific previously known package file
-- defaults to `dry_run = true` for safer first execution
-- can be used to validate rollback resolution before copying files
-
-### `promote-production.yml`
-
-Runs manually:
-- targets GitHub Environment `production`
-- uses the shared reusable deploy workflow
-- defaults to `dry_run = true` for safer first execution
-- is intended for a later validated-to-production promotion stage
-- uses `NT8_PRODUCTION_DROP_FOLDER` and requires checksum verification
-
-### `rollback-production.yml`
-
-Runs manually:
-- targets GitHub Environment `production`
-- redeploys a prior known-good production artifact
-- defaults to `dry_run = true` for safer first execution
-- requires checksum verification
-- is intended to pair with `docs/release-cutover-checklist.md`
-
-### `post-deploy-verify.yml`
-
-Runs manually on the Windows self-hosted runner:
-- executes `deploy/health-check.ps1` against a chosen drop/log folder pair
-- can require checksum validation
-- provides a lightweight verification pass after deploy, promote, or rollback
-
-### `_build-package.yml`
-
-Reusable workflow used by CI and release automation:
-- restores, builds, tests, and validates the solution
-- packages the NinjaTrader artifact with a supplied version
-- generates checksum files
-- optionally uploads artifacts for downstream workflows
-
-### `release.yml`
-
-Runs on version tags:
-- restores, builds, and tests the solution
-- normalizes tag versions like `v1.0.0` to package version `1.0.0`
-- packages release artifacts using the normalized semantic version
-- generates checksum files
-- publishes a GitHub Release with attached artifacts
-
-### `codeql.yml`
-
-Runs on pushes, pull requests, and a weekly schedule:
-- initializes CodeQL for C#
-- builds the solution
-- publishes static analysis results to GitHub Security
-
-## PowerShell packaging convention
-
-`deploy/package-nt8.ps1` creates a NinjaTrader-style zip package for supervised import workflows.
-
-Packaging flow:
-1. resolve source and output paths
-2. create a clean staging directory
-3. create `NinjaTrader 8\bin\Custom` under staging
-4. copy `.cs`, `.xml`, and `.json` payload files into `bin\Custom`
-5. emit `package-manifest.json`
-6. emit `IMPORT-INSTRUCTIONS.txt`
-7. create a versioned zip under `artifacts/exports`
-8. copy a rolling latest zip under `artifacts/packages`
-9. expose package paths as GitHub Actions outputs
-
-Example local command:
+Validate it locally:
 
 ```powershell
-pwsh .\deploy\package-nt8.ps1 `
-  -SourceRoot .\src `
-  -OutputRoot .\artifacts `
-  -StrategyName SampleStrategy `
-  -PackageName ZeroTouchNinjaTrader `
-  -Version 1.0.0
+dotnet run --project .\src\ConfigValidatorCli\ConfigValidatorCli.csproj -- .\config\deploy-settings.json
 ```
 
-## Project structure
+## Local build and package
+
+```powershell
+dotnet restore .\ZeroTouchNinjaTrader.sln
+dotnet build .\ZeroTouchNinjaTrader.sln -c Release
+dotnet test .\ZeroTouchNinjaTrader.sln -c Release
+
+.\deploy\package-nt8.ps1 -ConfigPath .\config\deploy-settings.json -Version 1.0.0
+```
+
+Package output names follow `docs/release-artifact-naming-reference.md`:
 
 ```text
-.github/workflows/     CI, deployment, and promotion workflows
-build/                 optional future build helpers
-deploy/                packaging, deployment, and health-check scripts
-src/Common/            shared config and validation code
-src/Strategy/          strategy scaffold placeholders
-src/Indicators/        indicator scaffold placeholders
-tests/Common.Tests/    unit tests
+artifacts/export/ZeroTouchNinjaTrader-ZeroTouchSampleStrategy-1.0.0.zip
+artifacts/export/ZeroTouchNinjaTrader-ZeroTouchSampleStrategy-1.0.0.zip.sha256
+artifacts/package/ZeroTouchNinjaTrader-ZeroTouchSampleStrategy-latest.zip
+artifacts/package/ZeroTouchNinjaTrader-ZeroTouchSampleStrategy-latest.zip.sha256
 ```
 
-## Repository governance
+Zip layout:
 
-- `CODEOWNERS` assigns default review ownership for workflows, deploy scripts, source, tests, and docs.
-- Pull requests use `.github/pull_request_template.md`.
-- Issues use the YAML forms under `.github/ISSUE_TEMPLATE/`.
-- Contribution expectations are documented in `CONTRIBUTING.md`.
-- Security reporting and hardening guidance are documented in `SECURITY.md`.
-- Release readiness can be tracked with `.github/ISSUE_TEMPLATE/release_readiness.yml`.
-
-## Branch protection and repository settings checklist
-
-Recommended settings for `main`:
-- set `main` as the default branch
-- require pull requests before merging
-- require at least 1 approval
-- require status checks before merging
-- require conversation resolution before merging
-- require review from code owners
-- block direct pushes after bootstrap
-
-Recommended GitHub Actions settings:
-- allow GitHub Actions to read repository contents by default
-- grant `contents: write` only to workflows that create releases
-- grant `security-events: write` only to CodeQL workflows that need it
-- restrict who can manually run deployment, rollback, and promotion workflows
-- prefer environment-scoped secrets/variables for deploy targets
-- enable Dependabot for GitHub Actions version updates
-- enable CodeQL analysis for ongoing static security scanning
-- review reusable workflow changes with the same scrutiny as deployment code
-- keep rollback and promote permissions limited to trusted maintainers
-
-Recommended environment settings:
-- create `sim` for deployment testing if you want environment-level controls there
-- create `validated` for promotion approvals
-- require reviewers on `validated`
-- optionally add a wait timer on `validated`
-
-## License
-
-This project is licensed under the MIT License. See `LICENSE`.
-
-## Repo-level .NET settings
-
-This repository includes:
-- `global.json` to pin expected .NET 8 SDK behavior
-- `Directory.Build.props` to centralize common build settings across projects
-
-Why this matters:
-- reduces "works on my machine" SDK drift
-- keeps all projects aligned on `net8.0`, nullable, implicit usings, and deterministic builds
-- makes GitHub-hosted CI and Windows self-hosted runners more predictable
-
-
-## Versioning and changelog
-
-- Update `src/Common/appsettings.json` for package name, strategy name, and version.
-- Create tags like `v1.0.0` to trigger tag-aware CI packaging.
-- Track notable user-facing changes in `CHANGELOG.md`.
-
-## Runner setup guide
-
-### 1. Create the self-hosted runner
-
-- go to GitHub repository settings
-- open **Actions > Runners**
-- add a **self-hosted Windows** runner
-- install it as a service
-- assign labels:
-  - `self-hosted`
-  - `windows`
-  - `nt8`
-
-### 2. Install software
-
-Install and verify:
-
-```powershell
-dotnet --info
-dotnet --list-sdks
-dotnet --list-runtimes
-pwsh --version
+```text
+NinjaTrader 8/bin/Custom/Strategies/<strategy>.cs
+NinjaTrader 8/bin/Custom/Indicators/<indicator>.cs
+AddOnContent/package-summary.txt
+package-manifest.json
+IMPORT-INSTRUCTIONS.txt
 ```
 
-Install NinjaTrader 8 and confirm the machine can access your intended local folders.
+## GitHub variables and environments
 
-### 3. Prepare deployment folders
+Set these GitHub variables for self-hosted deployment workflows:
 
-```powershell
-New-Item -ItemType Directory -Force -Path C:\NinjaTraderDeploy\Import
-New-Item -ItemType Directory -Force -Path C:\NinjaTraderDeploy\Validated
-New-Item -ItemType Directory -Force -Path C:\NinjaTraderDeploy\Logs
-New-Item -ItemType Directory -Force -Path C:\NinjaTraderDeploy\Staging
-New-Item -ItemType Directory -Force -Path C:\NinjaTraderDeploy\Exports
-```
+- `NT8_SIM_DROP_FOLDER`
+- `NT8_VALIDATED_DROP_FOLDER`
+- `NT8_PRODUCTION_DROP_FOLDER`
+- `NT8_LOG_FOLDER`
 
-### 4. Configure GitHub variables and environments
+Recommended environments:
 
-Add the variables listed above.
-
-Create environments:
 - `sim`
-- `validated`
+- `validated` with required reviewers
+- `production` with stricter required reviewers
 
-For `validated`, configure required reviewers to enforce manual approval before promotion jobs start.
+## Workflow summary
 
-### 5. Validate the runner
+| Workflow | Trigger | Purpose |
+|---|---|---|
+| `ci.yml` | push, pull_request | restore, build, test, validate config, package/upload artifacts |
+| `release.yml` | `v*` tag | normalize `v1.0.0` to `1.0.0`, package, publish release assets |
+| `deploy-sim.yml` | manual | deploy selected artifact to sim drop folder, supports dry-run |
+| `promote.yml` | manual | approval-gated deploy to validated folder |
+| `promote-production.yml` | manual | approval-gated deploy to production folder |
+| `rollback.yml` | manual | redeploy specified prior package to sim path |
+| `rollback-production.yml` | manual | redeploy specified prior production package |
+| `post-deploy-verify.yml` | manual | run health/checksum/log verification on a target folder |
+| `_build-package.yml` | reusable | shared build/test/package implementation |
+| `_deploy-package.yml` | reusable | shared artifact resolution, deploy, and health-check implementation |
 
-Run the CI workflow, then dispatch `deploy-sim.yml`.
+## Documentation navigation
 
-Expected outcomes:
-- a versioned zip package is created
-- a rolling latest package is created
-- the selected package is copied into the sim import folder
-- the checksum file is copied and validated when supplied
-- a deployment log is written
-- `health-check.ps1` reports the newest zip and log file
-
-## Next customization points
-
-Replace the scaffolded packaging logic with your exact NinjaTrader layout:
-- specific strategy and indicator folders under `src/Strategy` and `src/Indicators`
-- export structure expected by your NT8 import process
-- signing or hashing if desired
-- additional pre-deploy validation
-- stronger audit logging
-- artifact retention and rollback handling
-
-You may also want to add:
-- version stamping from git tags into `appsettings.json`
-- release notes generation
-- sim-only config overlays
-- runner disk space checks
-- checksums for package integrity
+- Full docs index: `docs/README.md`
+- Release process: `docs/release-process.md`
+- Hotfix process: `docs/hotfix-process.md`
+- Rollback: `docs/rollback.md`
+- Runner operations: `docs/runner-ops.md`
+- Troubleshooting: `docs/workflow-troubleshooting-matrix.md`
+- Workflow permissions: `docs/workflow-permissions-matrix.md`
+- Artifact naming: `docs/release-artifact-naming-reference.md`
+- Production setup: `docs/production-environment-checklist.md`
 
 ## Safety note
 
-This repository is set up for build, validation, packaging, and supervised environment promotion. Keep live trading controls, approvals, monitoring, and kill switches outside of unattended code promotion.
-
+This repository is for build, validation, packaging, and supervised environment promotion. Keep live trading controls, approvals, monitoring, account permissions, and kill switches outside unattended code promotion.
